@@ -94,6 +94,9 @@ class WeatherManager:
 
 city_weather = WeatherManager("tashkent")
 
+with open("../bot/weather_bot/tashkent.json", "w", encoding="utf8") as f:
+    json.dump(city_weather.get_daily_temperature(), f)
+
 
 def times():
     listbox.delete("1.0", END)

@@ -1,17 +1,30 @@
 import csv
 import os
 
-from exam_projects.weather_application.main import WeatherManager
+from projects.bot.weather_bot.get_data import get_data
 
 
-def write_to_csv(student):
-    with open("students.csv", "a+", newline="\n") as f:
-        header = ["chat_id", "fullname"]
+def write_row_to_csv(file_path, header, row):
+    with open(file_path, "a", newline="\n", encoding="utf8") as f:
         csv_writer = csv.DictWriter(f, header)
-        if os.path.getsize("students.csv") == 0:
+        if os.path.getsize(file_path) == 0:
             csv_writer.writeheader()
-        csv_writer.writerow(student.get_attrs_for_csv_writer())
-    print("Student add successfully.")
+        csv_writer.writerow(row)
+    print("Row add successfully.")
+
+
+def get_language_code_by_chat_id(chat_id, file_path):
+    with open(file_path, encoding="utf8") as f:
+        csv_reader = csv.DictReader(f)
+        langs = [
+            row.get("language_code")
+            for row in csv_reader
+            if int(row.get("id")) == chat_id
+        ]
+        if langs:
+            return langs[-1]
+        else:
+            return "uz"
 
 
 def is_exist_chat_id(chat_id):
@@ -21,5 +34,10 @@ def is_exist_chat_id(chat_id):
 
 
 def get_weather_days():
-    temperatures = WeatherManager().get_daily_temperature()
+    temperatures = get_data()
     return [day_temp.get("day") for day_temp in temperatures]
+
+
+def get_fullname(first_name, last_name):
+    return f"{first_name} {last_name}" if last_name else first_name
+
