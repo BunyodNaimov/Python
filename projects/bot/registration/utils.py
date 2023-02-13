@@ -1,8 +1,6 @@
 import csv
 import os
 
-from projects.bot.weather_bot.get_data import get_data
-
 
 def write_row_to_csv(file_path, header, row):
     with open(file_path, "a", newline="\n", encoding="utf8") as f:

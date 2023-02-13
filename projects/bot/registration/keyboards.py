@@ -51,3 +51,4 @@ inline_languages_program_btn.add(
 share_phone_btn = ReplyKeyboardMarkup(resize_keyboard=True)
 share_phone_btn.add(KeyboardButton("Share phone", request_contact=True))
 
+days_btn = ReplyKeyboardMarkup(row_width=True)
