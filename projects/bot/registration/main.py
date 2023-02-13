@@ -5,12 +5,11 @@ from telebot import custom_filters
 from telebot.types import BotCommand, ReplyKeyboardRemove
 from environs import Env
 
-from keyboards import languages_inline_btn, share_phone_btn, save_inline_btn, inline_languages_program_btn, days_btn
+from keyboards import languages_inline_btn, share_phone_btn, save_inline_btn, inline_languages_program_btn
 from messages import messages
 from states import StudentRegistrationForm
 from task import Chat, Task, Save
 from utils import get_fullname, write_row_to_csv, get_language_code_by_chat_id
-from get_data import get_data
 
 env = Env()
 env.read_env()
@@ -130,36 +129,6 @@ def callback(call):
         # bot.set_state(first_name_get(call.message), call.message.id)
 
 
-# /weather
-@bot.message_handler(commands=["weather"])
-def weather_handler(message):
-    today = datetime.now()
-    weather_data = get_data()
-    today_weather = None
-    for day_weather in weather_data:
-        day_date = datetime.strptime(day_weather.get("day"), "%Y.%m.%d")
-        if day_date.date() == today.date():
-            today_weather = day_weather
-    msg = f"<b>Bugungi ob-havo:</b>\n\n" \
-          f"<i>Harorat:</i> {today_weather.get('average_temperature')}"
-    bot.send_message(message.chat.id, msg, parse_mode="html", reply_markup=days_btn)
-
-
-@bot.message_handler(func=lambda message: message.text.startswith("Feb"))
-def day_weather_message(message):
-    date_msg = message.text
-    date = datetime.strptime(date_msg, "%b %d %Y")
-    weather_data = get_data()
-    weather = None
-    for day_weather in weather_data:
-        day_date = datetime.strptime(day_weather.get("day"), "%Y.%m.%d")
-        if day_date.date() == date.date():
-            weather = day_weather
-    msg = f"<b>{date_msg} ob-havo:</b>\n\n" \
-          f"<i>Harorat:</i> {weather.get('average_temperature')}"
-    bot.reply_to(message, msg)
-
-
 # /add
 @bot.message_handler(commands=["add"])
 def add_task_handler(message):
@@ -191,8 +160,7 @@ def my_commands():
     return [
         BotCommand("/start", "Start bot"),
         BotCommand("/add", "Add new task"),
-        BotCommand("/register", "Register student"),
-        BotCommand("/weather", "Today weather")
+        BotCommand("/register", "Register student")
     ]
 
 

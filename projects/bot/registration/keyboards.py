@@ -1,12 +1,9 @@
-
 from telebot.types import (
     ReplyKeyboardMarkup,
     KeyboardButton,
     InlineKeyboardMarkup,
     InlineKeyboardButton
 )
-
-languages_btn = ReplyKeyboardMarkup(resize_keyboard=True)
 
 LANGUAGES = {
     "UZ 🇺🇿": "uz",
@@ -51,4 +48,13 @@ inline_languages_program_btn.add(
 share_phone_btn = ReplyKeyboardMarkup(resize_keyboard=True)
 share_phone_btn.add(KeyboardButton("Share phone", request_contact=True))
 
-days_btn = ReplyKeyboardMarkup(row_width=True)
+
+days_btn = {
+    "Weather for 5 days": "5"
+}
+
+days_inline_btn = InlineKeyboardMarkup()
+
+days_inline_btn.add(
+    InlineKeyboardButton(list(days_btn.keys())[0], callback_data=list(days_btn.values())[0])
+)
