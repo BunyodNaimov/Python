@@ -33,11 +33,5 @@ def is_exist_chat_id(chat_id):
         return chat_id in [int(row.get("chat_id")) for row in csv_reader]
 
 
-def get_weather_days():
-    temperatures = get_data()
-    return [day_temp.get("day") for day_temp in temperatures]
-
-
 def get_fullname(first_name, last_name):
     return f"{first_name} {last_name}" if last_name else first_name
-

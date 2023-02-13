@@ -131,40 +131,6 @@ def callback(call):
         # bot.set_state(first_name_get(call.message), call.message.id)
 
 
-@bot.message_handler(commands=["weather"])
-def weather_handler(message):
-    today = datetime.now()
-    weather_data = get_data()
-    today_weather = None
-    for day_weather in weather_data:
-        day_date = datetime.strptime(day_weather.get("day"), "%Y.%m.%d")
-        if day_date.date() == today.date():
-            today_weather = day_weather
-    msg = f"<b>Bugungi ob-havo:</b>\n\n" \
-          f"<i>Harorat:</i> {today_weather.get('average_temperature')}"
-    bot.send_message(message.chat.id, msg, parse_mode="html", reply_markup=days_btn)
-
-
-@bot.message_handler(func=lambda message: message.text.startswith("Feb"))
-def day_weather_message(message):
-    date_msg = message.text
-    date = datetime.strptime(date_msg, "%b %d %Y")
-    weather_data = get_data()
-    weather = None
-    for day_weather in weather_data:
-        day_date = datetime.strptime(day_weather.get("day"), "%Y.%m.%d")
-        if day_date.date() == date.date():
-            weather = day_weather
-    msg = f"<b>{date_msg} ob-havo:</b>\n\n" \
-          f"<i>Harorat:</i> {weather.get('average_temperature')}"
-    bot.reply_to(message, msg)
-
-
-@bot.message_handler(func=lambda message: True)
-def echo_message(message):
-    bot.reply_to(message, message.text)
-
-
 # /add
 @bot.message_handler(commands=["add"])
 def add_task_handler(message):

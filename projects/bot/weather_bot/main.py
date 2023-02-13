@@ -7,7 +7,6 @@ from telebot.types import BotCommand
 from projects.bot.keyboards import days_btn
 from projects.bot.weather_bot.get_data import get_data
 
-
 env = Env()
 env.read_env()
 
