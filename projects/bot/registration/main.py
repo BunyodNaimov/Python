@@ -14,7 +14,7 @@ from utils import get_fullname, write_row_to_csv, get_language_code_by_chat_id
 env = Env()
 env.read_env()
 
-BOT_TOKEN = env("TELEGRAM_API")
+BOT_TOwKEN = env("TELEGRAM_API")
 
 bot = telebot.TeleBot(BOT_TOKEN, parse_mode="html")
 

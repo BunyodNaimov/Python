@@ -5,6 +5,7 @@ from telebot.types import BotCommand
 
 from get_data import get_data
 from keyboards import days_inline_btn
+from projects.bot.registration.keyboards import weather_inline_btn, get_dict_info
 
 env = Env()
 env.read_env()
@@ -31,25 +32,10 @@ def weather_handler(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def weather_handler(call):
-    print(call.data)
-    if "5" in call.data:
-        day_weather_message(call.message)
-
-
-@bot.message_handler(func=lambda message: message.text.startswith("Feb"))
-def day_weather_message(message):
-    date_msg = message.text
-    date = datetime.strptime(date_msg, "%b %d %Y")
-    weather_data = get_data()
-    weather = None
-    for day_weather in weather_data:
-        day_date = datetime.strptime(day_weather.get("day"), "%Y.%m.%d")
-        if day_date.date() == date.date():
-            weather = day_weather
-    msg = f"<b>{date_msg} ob-havo:</b>\n\n" \
-          f"<i>Harorat:</i> {weather.get('average_temperature')}"
-    print(msg)
-    bot.reply_to(message, msg)
+    if call.data == "5":
+        bot.send_message(call.message.chat.id, "Entry date ", reply_markup=weather_inline_btn)
+    if call.data != "5":
+        bot.send_message(call.message.chat.id, f"{call.data}")
 
 
 def my_commands():
