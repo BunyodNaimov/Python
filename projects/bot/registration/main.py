@@ -5,13 +5,11 @@ from telebot import custom_filters
 from telebot.types import BotCommand, ReplyKeyboardRemove
 from environs import Env
 
-from projects.bot.weather_bot.get_data import get_data
-from projects.bot.keyboards import languages_inline_btn, share_phone_btn, save_inline_btn, inline_languages_program_btn, \
-    days_btn
-from projects.bot.registration.messages import messages
-from projects.bot.registration.states import StudentRegistrationForm
-from projects.bot.registration.task import Chat, Task, Save
-from projects.bot.utils import get_fullname, write_row_to_csv, get_language_code_by_chat_id
+from keyboards import languages_inline_btn, share_phone_btn, save_inline_btn, inline_languages_program_btn
+from messages import messages
+from states import StudentRegistrationForm
+from task import Chat, Task, Save
+from utils import get_fullname, write_row_to_csv, get_language_code_by_chat_id
 
 env = Env()
 env.read_env()
