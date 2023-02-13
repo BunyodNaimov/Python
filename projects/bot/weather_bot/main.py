@@ -5,7 +5,7 @@ from telebot.types import BotCommand
 
 from get_data import get_data
 from keyboards import days_inline_btn
-from projects.bot.registration.keyboards import weather_inline_btn, get_dict_info
+from keyboards import weather_inline_btn
 
 env = Env()
 env.read_env()

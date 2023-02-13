@@ -81,6 +81,7 @@ def phone_get(message):
 @bot.message_handler(state=StudentRegistrationForm.age)
 def age_get(message):
     bot.send_message(message.chat.id, "Tilni kiriting:", reply_markup=languages_inline_btn)
+    print(message.data)
     bot.set_state(message.from_user.id, StudentRegistrationForm.language, message.chat.id)
     with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data["age"] = message.text
