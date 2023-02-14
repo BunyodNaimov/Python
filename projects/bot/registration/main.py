@@ -6,7 +6,7 @@ from telebot.types import BotCommand, ReplyKeyboardRemove
 from environs import Env
 
 from keyboards import share_phone_btn, save_inline_btn, \
-    get_languages_btn, program_language_btn
+    get_languages_btn, get_program_language_btn
 from messages import messages
 from states import StudentRegistrationForm
 from task import Chat, Task, Save
@@ -91,13 +91,11 @@ def age_get(message):
         data["age"] = message.text
 
 
-# @bot.message_handler(state=StudentRegistrationForm.language)
-@bot.callback_query_handler(lambda call: call.data.startswith("lang"), stat=StudentRegistrationForm.language)
+@bot.callback_query_handler(lambda call: call.data.startswith("lang"), state=StudentRegistrationForm.language)
 def language_get(call):
-    print("hello")
     message = call.message
     lang_code = call.data.split("_")[2]
-    bot.send_message(message.chat.id, 'Kursni kiriting:', reply_markup=program_language_btn("course"))
+    bot.send_message(message.chat.id, 'Kursni kiriting:', reply_markup=get_program_language_btn("course"))
     bot.set_state(message.from_user.id, StudentRegistrationForm.course, message.chat.id)
     with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data['language'] = lang_code
@@ -105,7 +103,6 @@ def language_get(call):
 
 @bot.callback_query_handler(lambda call: call.data.startswith("course"), state=StudentRegistrationForm.course)
 def course_get(call):
-    print(call.data)
     message = call.message
     course = call.data.split("_")[1]
     with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
@@ -138,7 +135,7 @@ def callback(call):
             save_info.get_save_info_csv()
         )
     elif text == "no":
-        bot.send_message(message.chat.id,  "Ma'lumotlar saqlanmadi qaytadan /register")
+        bot.send_message(message.chat.id, "Ma'lumotlar saqlanmadi qaytadan /register")
 
 
 # /add
