@@ -5,7 +5,8 @@ from telebot import custom_filters
 from telebot.types import BotCommand, ReplyKeyboardRemove
 from environs import Env
 
-from keyboards import languages_inline_btn, share_phone_btn, save_inline_btn, inline_languages_program_btn
+from keyboards import share_phone_btn, save_inline_btn, \
+    get_languages_btn, program_language_btn
 from messages import messages
 from states import StudentRegistrationForm
 from task import Chat, Task, Save
@@ -14,7 +15,7 @@ from utils import get_fullname, write_row_to_csv, get_language_code_by_chat_id
 env = Env()
 env.read_env()
 
-BOT_TOwKEN = env("TELEGRAM_API")
+BOT_TOKEN = env("TELEGRAM_API")
 
 bot = telebot.TeleBot(BOT_TOKEN, parse_mode="html")
 
@@ -25,13 +26,13 @@ def welcome_message(message):
     chat_id = message.chat.id
     user = message.from_user
     fullname = get_fullname(user.first_name, user.last_name)
-    bot.send_message(chat_id, f"Assalomu alaykum, {fullname}", reply_markup=languages_inline_btn)
+    bot.send_message(chat_id, f"Assalomu alaykum, {fullname}", reply_markup=get_languages_btn("register"))
 
 
-@bot.callback_query_handler(lambda call: call.data.startswith("language_"))
+@bot.callback_query_handler(lambda call: call.data.startswith("register_language_"))
 def set_language_query_handler(call):
     message = call.message
-    lang_code = call.data.split("_")[1]
+    lang_code = call.data.split("_")[2]
     chat = message.chat
     new_chat = Chat(
         chat.id,
@@ -70,49 +71,60 @@ def last_name_get(message):
         data["last_name"] = message.text
 
 
-@bot.message_handler(state=StudentRegistrationForm.phone, content_types=["contact"])
+@bot.message_handler(state=StudentRegistrationForm.phone, content_types=["contact", "text"])
 def phone_get(message):
     bot.send_message(message.chat.id, "Yoshingizni kiriting", reply_markup=ReplyKeyboardRemove())
     bot.set_state(message.from_user.id, StudentRegistrationForm.age, message.chat.id)
     with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
-        data["phone"] = message.contact.phone_number
+        if message.contact is None:
+            data["phone"] = message.text
+
+        else:
+            data["phone"] = message.contact.phone_number
 
 
 @bot.message_handler(state=StudentRegistrationForm.age)
 def age_get(message):
-    bot.send_message(message.chat.id, "Tilni kiriting:", reply_markup=languages_inline_btn)
-    print(message.data)
+    bot.send_message(message.chat.id, "Tilni kiriting:", reply_markup=get_languages_btn("lang"))
     bot.set_state(message.from_user.id, StudentRegistrationForm.language, message.chat.id)
     with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data["age"] = message.text
 
 
-@bot.message_handler(state=StudentRegistrationForm.language)
-def language_get(message):
-    bot.send_message(message.chat.id, 'Kursni kiriting:', reply_markup=inline_languages_program_btn)
+# @bot.message_handler(state=StudentRegistrationForm.language)
+@bot.callback_query_handler(lambda call: call.data.startswith("lang"), stat=StudentRegistrationForm.language)
+def language_get(call):
+    print("hello")
+    message = call.message
+    lang_code = call.data.split("_")[2]
+    bot.send_message(message.chat.id, 'Kursni kiriting:', reply_markup=program_language_btn("course"))
     bot.set_state(message.from_user.id, StudentRegistrationForm.course, message.chat.id)
     with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
-        data['language'] = message.text
+        data['language'] = lang_code
 
 
-@bot.message_handler(state=StudentRegistrationForm.course)
-def course_get(message):
+@bot.callback_query_handler(lambda call: call.data.startswith("course"), state=StudentRegistrationForm.course)
+def course_get(call):
+    print(call.data)
+    message = call.message
+    course = call.data.split("_")[1]
     with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
-        data['course'] = message.text
+        data['course'] = course
         msg = "Quyidagi ma'lumotlar qa'bul qilindi:\n"
         msg += f"Fullname: {data.get('first_name')} {data.get('last_name')}\n"
         msg += f"Phone: {data.get('phone')}\n"
         msg += f"Age: {data.get('age')}\n"
         msg += f"Language: {data.get('language')}\n"
         msg += f"Course: {data.get('course')}"
-        bot.send_message(message.chat.id, msg, parse_mode="html", reply_markup=save_inline_btn)
+        bot.send_message(message.chat.id, msg, parse_mode="html", reply_markup=save_inline_btn("save"))
     bot.delete_state(message.from_user.id, message.chat.id)
 
 
-@bot.callback_query_handler(func=lambda call: True)
+@bot.callback_query_handler(func=lambda call: call.data.startswith("save"))
 def callback(call):
-    text = call.message.text.split("\n")[1:]
-    if "ok" in call.data:
+    message = call.message
+    text = call.data.split("_")[1]
+    if text == "ok":
         save_info = Save(
             text[0].split(":")[1].strip(),
             text[1].split(":")[1].strip(),
@@ -125,9 +137,8 @@ def callback(call):
             save_info.get_save_info_csv().keys(),
             save_info.get_save_info_csv()
         )
-    else:
-        pass  # Tugatilmagan
-        # bot.set_state(first_name_get(call.message), call.message.id)
+    elif text == "no":
+        bot.send_message(message.chat.id,  "Ma'lumotlar saqlanmadi qaytadan /register")
 
 
 # /add

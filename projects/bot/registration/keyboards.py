@@ -7,48 +7,62 @@ from telebot.types import (
     InlineKeyboardButton
 )
 
-from projects.bot.weather_bot.get_data import get_data
 
-LANGUAGES = {
-    "UZ 🇺🇿": "uz",
-    "RU 🇷🇺": "ru",
-    "ENG 🇬🇧": "en"
-}
+def get_languages_btn(action):
+    languages = {
+        "UZ 🇺🇿": "uz",
+        "RU 🇷🇺": "ru",
+        "ENG 🇬🇧": "en"
+    }
 
-languages_inline_btn = InlineKeyboardMarkup()
+    languages_inline_btn = InlineKeyboardMarkup()
 
-languages_inline_btn.add(
-    InlineKeyboardButton(list(LANGUAGES.keys())[0], callback_data=f"language_{list(LANGUAGES.values())[0]}"),
-    InlineKeyboardButton(list(LANGUAGES.keys())[1], callback_data=f"language_{list(LANGUAGES.values())[1]}"),
-    InlineKeyboardButton(list(LANGUAGES.keys())[2], callback_data=f"language_{list(LANGUAGES.values())[2]}")
-)
+    languages_inline_btn.add(
+        InlineKeyboardButton(
+            list(languages.keys())[0], callback_data=f"{action}_language_{list(languages.values())[0]}"
+        ),
+        InlineKeyboardButton(
+            list(languages.keys())[1], callback_data=f"{action}_language_{list(languages.values())[1]}"
+        ),
+        InlineKeyboardButton(
+            list(languages.keys())[2], callback_data=f"{action}_language_{list(languages.values())[2]}"
+        )
+    )
+    print(languages_inline_btn)
+    return languages_inline_btn
 
-SAVE = {
-    "☑️": "ok",
-    "✏️": "no"
-}
 
-save_inline_btn = InlineKeyboardMarkup()
+def save_inline_btn(action):
+    save = {
+        "☑️": "ok",
+        "✏️": "no"
+    }
+    save_btn = InlineKeyboardMarkup()
 
-save_inline_btn.add(
-    InlineKeyboardButton(list(SAVE.keys())[0], callback_data=list(SAVE.values())[0]),
-    InlineKeyboardButton(list(SAVE.keys())[1], callback_data=list(SAVE.values())[1])
-)
+    save_btn.add(
+        InlineKeyboardButton(list(save.keys())[0], callback_data=f"{action}_{list(save.values())[0]}"),
+        InlineKeyboardButton(list(save.keys())[1], callback_data=f"{action}_{list(save.values())[1]}")
+    )
 
-languages_program_btn = {
-    "Python": "Python",
-    "C++": "C++",
-    "C#": "C#"
-}
 
-inline_languages_program_btn = InlineKeyboardMarkup()
+def program_language_btn(action):
+    program_btn = {
+        "Python": "Python",
+        "C++": "C++",
+        "C#": "C#"
+    }
 
-inline_languages_program_btn.add(
-    InlineKeyboardButton(list(languages_program_btn.keys())[0], callback_data=list(languages_program_btn.values())[0]),
-    InlineKeyboardButton(list(languages_program_btn.keys())[1], callback_data=list(languages_program_btn.values())[1]),
-    InlineKeyboardButton(list(languages_program_btn.keys())[2], callback_data=list(languages_program_btn.values())[2])
-)
+    languages_program_btn = InlineKeyboardMarkup()
+
+    languages_program_btn.add(
+        InlineKeyboardButton(list(program_btn.keys())[0],
+                             callback_data=f"{action}_{list(program_btn.values())[0]}"),
+        InlineKeyboardButton(list(program_btn.keys())[1],
+                             callback_data=f"{action}_{list(program_btn.values())[1]}"),
+        InlineKeyboardButton(list(program_btn.keys())[2],
+                             callback_data=f"{action}_{list(program_btn.values())[2]}")
+    )
+
 
 share_phone_btn = ReplyKeyboardMarkup(resize_keyboard=True)
 share_phone_btn.add(KeyboardButton("Share phone", request_contact=True))
-
