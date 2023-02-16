@@ -99,7 +99,6 @@ def language_get(call):
     bot.set_state(message.from_user.id, StudentRegistrationForm.course, message.chat.id)
     with bot.retrieve_data(call.from_user.id, message.chat.id) as data:
         data['language'] = lang_code
-        print(data.get('language'))
 
 
 @bot.callback_query_handler(lambda call: call.data.startswith("course"))
