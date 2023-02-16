@@ -135,6 +135,7 @@ def callback(call):
             save_info.get_save_info_csv().keys(),
             save_info.get_save_info_csv()
         )
+        bot.send_message(message.chat.id, "Registratsiya muvaffaqiyatli tugadi!")
 
     elif text == "no":
         bot.send_message(message.chat.id, "Ma'lumotlar saqlanmadi qaytadan /register")
