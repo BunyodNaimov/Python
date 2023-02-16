@@ -33,3 +33,14 @@ def is_exist_chat_id(chat_id):
 
 def get_fullname(first_name, last_name):
     return f"{first_name} {last_name}" if last_name else first_name
+
+
+def reader_row_in_csv(file_path, chat_id):
+    lst = []
+    with open(file_path, encoding="utf8") as f:
+        csv_reader = csv.DictReader(f)
+        for i in csv_reader:
+            if i.get("chat_id") == str(chat_id):
+                lst.append(f"{i.get('name')}")
+
+    return lst

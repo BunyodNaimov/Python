@@ -6,11 +6,11 @@ from telebot.types import BotCommand, ReplyKeyboardRemove
 from environs import Env
 
 from keyboards import share_phone_btn, save_inline_btn, \
-    get_languages_btn, get_program_language_btn
+    get_languages_btn, program_language_btn
 from messages import messages
 from states import StudentRegistrationForm
 from task import Chat, Task, Save
-from utils import get_fullname, write_row_to_csv, get_language_code_by_chat_id
+from utils import get_fullname, write_row_to_csv, get_language_code_by_chat_id, reader_row_in_csv
 
 env = Env()
 env.read_env()
@@ -95,17 +95,18 @@ def age_get(message):
 def language_get(call):
     message = call.message
     lang_code = call.data.split("_")[2]
-    bot.send_message(message.chat.id, 'Kursni kiriting:', reply_markup=get_program_language_btn("course"))
+    bot.send_message(message.chat.id, 'Kursni kiriting:', reply_markup=program_language_btn("course"))
     bot.set_state(message.from_user.id, StudentRegistrationForm.course, message.chat.id)
-    with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
+    with bot.retrieve_data(call.from_user.id, message.chat.id) as data:
         data['language'] = lang_code
+        print(data.get('language'))
 
 
-@bot.callback_query_handler(lambda call: call.data.startswith("course"), state=StudentRegistrationForm.course)
+@bot.callback_query_handler(lambda call: call.data.startswith("course"))
 def course_get(call):
     message = call.message
     course = call.data.split("_")[1]
-    with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
+    with bot.retrieve_data(call.from_user.id, message.chat.id) as data:
         data['course'] = course
         msg = "Quyidagi ma'lumotlar qa'bul qilindi:\n"
         msg += f"Fullname: {data.get('first_name')} {data.get('last_name')}\n"
@@ -114,7 +115,6 @@ def course_get(call):
         msg += f"Language: {data.get('language')}\n"
         msg += f"Course: {data.get('course')}"
         bot.send_message(message.chat.id, msg, parse_mode="html", reply_markup=save_inline_btn("save"))
-    bot.delete_state(message.from_user.id, message.chat.id)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("save"))
@@ -122,20 +122,34 @@ def callback(call):
     message = call.message
     text = call.data.split("_")[1]
     if text == "ok":
-        save_info = Save(
-            text[0].split(":")[1].strip(),
-            text[1].split(":")[1].strip(),
-            text[2].split(":")[1].strip(),
-            text[3].split(":")[1].strip(),
-            text[4].split(":")[1].strip(),
-        )
+        with bot.retrieve_data(call.from_user.id, message.chat.id) as data:
+            save_info = Save(
+                f"{data.get('first_name')} {data.get('last_name')}",
+                data.get("phone"),
+                data.get("age"),
+                data.get("language"),
+                data.get("course")
+            )
+
         write_row_to_csv(
             "registration.csv",
             save_info.get_save_info_csv().keys(),
             save_info.get_save_info_csv()
         )
+
     elif text == "no":
         bot.send_message(message.chat.id, "Ma'lumotlar saqlanmadi qaytadan /register")
+    bot.delete_state(message.from_user.id, message.chat.id)
+
+
+# /tasks
+@bot.message_handler(commands=['tasks'])
+def list_of_tasks(message):
+    msg = ""
+    chat_id = message.chat.id
+    for i in reader_row_in_csv("tasks.csv", chat_id):
+        msg += f"{i}\n"
+    bot.send_message(message.chat.id, msg)
 
 
 # /add
@@ -169,6 +183,7 @@ def my_commands():
     return [
         BotCommand("/start", "Start bot"),
         BotCommand("/add", "Add new task"),
+        BotCommand("/tasks", "Show tasks"),
         BotCommand("/register", "Register student")
     ]
 

@@ -45,16 +45,16 @@ def save_inline_btn(action):
     return save_btn
 
 
-def get_program_language_btn(action):
+def program_language_btn(action):
     program_btn = {
         "Python": "Python",
         "C++": "C++",
         "C#": "C#"
     }
 
-    languages_program_btn = InlineKeyboardMarkup()
+    lang_program_btn = InlineKeyboardMarkup()
 
-    languages_program_btn.add(
+    lang_program_btn.add(
         InlineKeyboardButton(list(program_btn.keys())[0],
                              callback_data=f"{action}_{list(program_btn.values())[0]}"),
         InlineKeyboardButton(list(program_btn.keys())[1],
@@ -62,7 +62,7 @@ def get_program_language_btn(action):
         InlineKeyboardButton(list(program_btn.keys())[2],
                              callback_data=f"{action}_{list(program_btn.values())[2]}")
     )
-    return languages_program_btn
+    return lang_program_btn
 
 
 share_phone_btn = ReplyKeyboardMarkup(resize_keyboard=True)

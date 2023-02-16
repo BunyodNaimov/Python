@@ -39,8 +39,6 @@ class Save:
 
     def get_save_info_csv(self):
 
-        # with open(file_path, "a", encoding="utf8", newline="\n") as f:
-
         return {
             "Fullname": self.full_name,
             "Phone": self.phone,
